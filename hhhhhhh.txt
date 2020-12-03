@@ -1,0 +1,5 @@
+--save $CHECKPOINT --template "linear3_${CIFAR10}_VGG" --model ${Hinge_VGG} --vgg_type 16 --batch_size 64 --epochs ${300} --decay ${hingestep-150-225} --lr ${0.1} --lr_ratio ${0.01} --lr_factor ${0.1} --optimizer PG --ratio ${0.6090} --sparsity_regularizer ${l1} --regularization_factor ${2e-4} --init_method ${svd2} --threshold ${5e-2} --annealing_factor ${2} --annealing_t1 400 --annealing_t2 200 --stop_limit ${0.1} --teacher ${../model_zoo/baseline}/vgg.pt --pretrain ${../model_zoo/baseline}/vgg.pt --dir_save ${~/projects/logs/} --dir_data ${~/projects/data}
+
+CHECKPOINT=${Hinge_VGG}_${CIFAR10}_LR${0.1}r${0.01}f${0.1}_${svd2}_R${2e-4}_T${5e-2}_S${0.1}_A${2}_E${300}_${l1}_Ratio${0.6090}
+
+echo $CHECKPOINT

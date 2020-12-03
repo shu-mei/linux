@@ -1,0 +1,13 @@
+--save Hinge_ResNet_Basic_SVD_CIFAR10_L56_LR0.1r0.01f1_svd2_R4e-4_T5e-3_S0.1_A2_E300_l1d2_Ratio0.5_Same_Balance_Dis --template ResNet --model Hinge_ResNet_Basic_SVD --depth 56 --batch_size 64 --downsample_type A 
+--epochs 300 --decay hingestep-150-225 --lr 0.1 --lr_ratio 0.01 --lr_factor 1 --optimizer PG --ratio 0.5 
+--sparsity_regularizer l1d2 --regularization_factor 4e-4 --init_method svd2 --threshold 5e-3 --annealing_factor 2 
+--stop_limit 0.1 --p1_p2_same_ratio --layer_balancing –distillation 
+--teacher ./model_zoo/baseline/resnet56_b128e164.pt 
+--pretrain ./model_zoo/baseline/resnet56_b128e164.pt 
+--dir_save ~/projects/logs/
+--dir_data ~/projects/data
+
+
+
+
+--model "cifar10_dlda" --data "cifar10"

@@ -1,0 +1,81 @@
+import torch
+from torch import nn, optim
+import torch.nn.functional as F
+from torchvision import datasets, transforms
+import matplotlib.pyplot as plt
+
+transforms = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
+
+trainset = datasets.FashionMNIST('dataset/', download=True, train=True, transform=transforms)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True)
+
+testset = datasets.FashionMNIST('dataset/', download=True, train=False, transform=transforms)
+testloader = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=True)
+
+
+class Classifier(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(784, 256)
+        self.fc2 = nn.Linear(256, 128)
+        self.fc3 = nn.Linear(128, 64)
+        self.fc4 = nn.Linear(64, 10)
+
+    def forward(self, x):
+        x = x.view(x.shape[0], -1)
+
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = F.relu(self.fc3(x))
+        # x = F.log_softmax(self.fc4(x), dim=1)
+
+        return x
+model = Classifier()
+
+criterion = nn.CrossEntropyLoss()
+
+optimizer = optim.SGD(model.parameters(), lr=0.003)
+
+epochs = 15
+
+train_losses, test_losses = [], []
+
+print('training start')
+
+for e in range(epochs):
+    running_loss = 0
+
+    for image, label in trainloader:
+
+        optimizer.zero_grad()
+
+        prediction = model(image)
+        loss = criterion(prediction, label)
+        loss.backward()
+        optimizer.step()
+        running_loss += loss.item()
+    else:
+        test_loss = 0
+        accuracy = 0
+
+        with torch.no_grad():
+
+            model.eval()
+
+            for image, label in testloader:
+                prediction = model(image)
+                test_loss += criterion(prediction, label)
+                # ps = torch.exp(prediction)
+                top_p, top_class = prediction.topk(1, dim=1)
+                equals = top_class = label.view(*top_class.shape)
+                accuracy += torch.mean(equals.type(torch.FloatTensor))
+        model.train()
+
+        train_losses.append(running_loss/len(trainloader))
+        test_losses.append(test_loss/len(testloader))
+
+        print('Training set learning times: {}/{}..'.format(e+1, epochs),
+              'trainloss: {:.3f}..'.format(running_loss/len(trainloader)),
+              'testloss: {:.3f}..'.format(test_loss/len(testloader)),
+              'accuracy: {:.3f}..'.format(accuracy/len(testloader)))
+
